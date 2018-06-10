@@ -11,6 +11,7 @@ def cnn_model_fn(features, labels, mode):
     input_layer = tf.reshape(features["x"], [-1, 64, 64, 3])
 
     # Convolutional Layer #1
+    #32
     conv1_1 = tf.layers.conv2d(
         inputs=input_layer,
         filters=32,
@@ -23,6 +24,7 @@ def cnn_model_fn(features, labels, mode):
     pool1 = tf.layers.max_pooling2d(inputs=conv1_1, pool_size=[2, 2], strides=2)
 
     # Convolutional Layer #2
+    #64
     conv2_1 = tf.layers.conv2d(
         inputs=pool1,
         filters=64,
@@ -36,7 +38,7 @@ def cnn_model_fn(features, labels, mode):
     pool2 = tf.layers.max_pooling2d(inputs=conv2_1, pool_size=[2, 2], strides=2)
 
     # Convolutional Layer #3
-
+    #128
     conv3_1 = tf.layers.conv2d(
         inputs=pool2,
         filters=128,
@@ -47,7 +49,7 @@ def cnn_model_fn(features, labels, mode):
     )
 
     # Pooling Layer #3
-    pool3 = tf.layers.max_pooling2d(inputs=conv3_1, pool_size=[2, 2], strides=2)
+    pool3 = tf.layers.average_pooling2d(inputs=conv3_1, pool_size=[2, 2], strides=2)
 
     pool_flat = tf.reshape(pool3, [-1, 8 * 8 * 128])
 
@@ -74,7 +76,7 @@ def cnn_model_fn(features, labels, mode):
         onehot_labels=onehot_labels, logits=logits)
 
     if mode == tf.estimator.ModeKeys.TRAIN:
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.0005)
         train_op = optimizer.minimize(
             loss=loss,
             global_step=tf.train.get_global_step())
@@ -104,7 +106,7 @@ def TrainAndTest (train_data, test_data, train_labels, test_labels):
     eval_labels = np.asarray(test_labels, dtype=np.int32)
 
     mnist_classifier = tf.estimator.Estimator(
-        model_fn=cnn_model_fn, model_dir="/Users/tianzhang/Documents/NU/EECS349/project/data")
+        model_fn=cnn_model_fn) #model_dir="/Users/tianzhang/Documents/NU/EECS349/project/data")
 
     tensors_to_log = {"probabilities": "softmax_tensor"}
     logging_hook = tf.train.LoggingTensorHook(
@@ -113,12 +115,12 @@ def TrainAndTest (train_data, test_data, train_labels, test_labels):
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
         y=train_labels,
-        batch_size=10,
+        batch_size=32,
         num_epochs=None,
         shuffle=True)
     mnist_classifier.train(
         input_fn=train_input_fn,
-        steps=4000,
+        steps=5000,
         hooks=[logging_hook])
 
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(

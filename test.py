@@ -10,6 +10,9 @@ import shiqiang as sq
 ASSET_DIR = '/Users/tianzhang/Documents/NU/EECS349/project/asset'
 ANNOTATION_FILE = ASSET_DIR + '/annotation.txt'
 
+new_max = 127
+new_min = -128
+
 annotation = open(ANNOTATION_FILE, "r")
 NUMBER = 1000
 PIC_SIZE = 64
@@ -129,7 +132,23 @@ def loadImage():
 
     return pic_res, test, tag_train.T, tag_test.T
 
-
+#input
+def Normalization(a):
+    #rememeber the outer dimension of array
+    o_dimension = a.shape[0]
+    for i in range(o_dimension):
+        i_dimension = a[i].shape
+        temp1 = a[i].flatten()
+        temp2 = sorted(a[i].flatten())
+        min = temp2[0]
+        max = temp2[-1]
+        idx = 0
+        while(idx < len(temp1)):
+            temp1[idx] = (temp1[idx]-min)*(new_max - new_min) / (max - min) + new_min
+            idx += 1
+        temp1.shape = i_dimension
+        a[i] = temp1
+    return a
 
 if __name__ == '__main__':
     picsdata = []
@@ -138,5 +157,18 @@ if __name__ == '__main__':
     tag_test = []
 
     picsdata, testdata, tag_train, tag_test = loadImage()
+    picsdata = Normalization(picsdata)
+    testdata = Normalization(testdata)
+    tag_train = Normalization(tag_train)
+    tag_test = Normalization(tag_test)
+
+    print("the shape of pic data is: ")
+    print(picsdata.shape)
+    print("the shape of test data is: ")
+    print(testdata.shape)
+    print("the shape of tag_train data is: ")
+    print(tag_train.shape)
+    print("the shape of tag_test data is: ")
+    print(tag_test.shape)
 
     sq.TrainAndTest(picsdata, testdata, tag_train.flatten(), tag_test.flatten())
