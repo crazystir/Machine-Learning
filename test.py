@@ -127,6 +127,8 @@ if __name__ == "__main__":
                          }))
         examples.append(example)
 
+    random.shuffle(examples)
+
     for i in range(0, len(examples) / 3):
         test_writer.write(examples[i].SerializeToString())
     for i in range(len(examples) / 3, len(examples)):
