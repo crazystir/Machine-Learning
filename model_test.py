@@ -45,51 +45,77 @@ def cnn_model_fn():
     conv1_1 = tf.layers.conv2d(
         inputs=x_norm,
         filters=32,
-        kernel_size=[5, 5],
+        kernel_size=[3, 3],
         padding="same",
         name="first",
         activation=tf.nn.relu)
+    conv1_2 = tf.layers.conv2d(
+        inputs=conv1_1,
+        filters=32,
+        kernel_size=[3, 3],
+        padding="valid",
+        name="first_2",
+        activation=tf.nn.relu
+    )
 
-    conv1_1_norm = tf.layers.batch_normalization(conv1_1, training = tag)
+    conv1_norm = tf.layers.batch_normalization(conv1_2, training = tag)
     # Pooling Layer #1
-    pool1 = tf.layers.max_pooling2d(inputs=conv1_1_norm, pool_size=[2, 2], strides=2)
+    pool1 = tf.layers.max_pooling2d(inputs=conv1_norm, pool_size=[5, 5], strides=2)
 
     # Convolutional Layer #2
     #64
     conv2_1 = tf.layers.conv2d(
         inputs=pool1,
         filters=64,
-        kernel_size=[5, 5],
+        kernel_size=[3, 3],
         padding="same",
         name="second",
         activation=tf.nn.relu
     )
 
-    conv2_1_norm = tf.layers.batch_normalization(conv2_1, training=tag)
+    conv2_2 = tf.layers.conv2d(
+        inputs=conv2_1,
+        filters=64,
+        kernel_size=[3, 3],
+        padding="valid",
+        name="second_2",
+        activation=tf.nn.relu
+    )
+    conv2_norm = tf.layers.batch_normalization(conv2_2, training=tag)
     # Pooling Layer #2
-    pool2 = tf.layers.max_pooling2d(inputs=conv2_1_norm, pool_size=[2, 2], strides=2)
+    pool2 = tf.layers.max_pooling2d(inputs=conv2_norm, pool_size=[2, 2], strides=2)
 
     # Convolutional Layer #3
-    #128
+    # 128
     conv3_1 = tf.layers.conv2d(
         inputs=pool2,
-        filters=128,
-        kernel_size=[5, 5],
+        filters=256,
+        kernel_size=[3, 3],
         padding="same",
         name="third",
         activation=tf.nn.relu
     )
 
-    conv3_1_norm = tf.layers.batch_normalization(conv3_1, training=tag)
-    # Pooling Layer #3
-    pool3 = tf.layers.average_pooling2d(inputs=conv3_1_norm, pool_size=[2, 2], strides=2)
+    conv3_2 = tf.layers.conv2d(
+        inputs=conv3_1,
+        filters=256,
+        kernel_size=[3, 3],
+        padding="valid",
+        name="third",
+        activation=tf.nn.relu
+    )
 
-    pool_flat = tf.reshape(pool3, [-1, 8 * 8 * 128])
+
+    conv3_norm = tf.layers.batch_normalization(conv3_2, training=tag)
+    # Pooling Layer #3
+    pool3 = tf.layers.average_pooling2d(inputs=conv3_norm, pool_size=[2, 2], strides=2)
+
+    pool_flat = tf.reshape(pool3, [-1, 7 * 7 * 256])
 
     dense = tf.layers.dense(inputs=pool_flat, units=1024, activation=tf.nn.relu)
 
     dropout = tf.layers.dropout(
-        inputs=dense, rate=0.2)
+        inputs=dense, rate=0.5)
 
     logits = tf.layers.dense(inputs=dropout, units=18)
 
@@ -128,7 +154,7 @@ def save(sess):
 def TrainAndTest():
     # Load training and eval data
     # mnist = tf.contrib.learn.datasets.load_dataset("mnist")
-    batch_size = 32
+    batch_size = 512
     test_step = 10
     x_train, y_train = load_data_source("train.tfrecord", batch_size)
     x_test, y_test = load_data_source("test.tfrecord", batch_size)

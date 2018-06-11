@@ -13,7 +13,7 @@ NORM_FACTOR = 128
 OFFSET = 0.5
 
 annotation = open(ANNOTATION_FILE, "r")
-NUMBER = 100
+NUMBER = 2000
 PIC_SIZE = 64
 map_characters = {'abraham_grampa_simpson\n': 0, 'apu_nahasapeemapetilon\n': 1, 'bart_simpson\n': 2,
                   'charles_montgomery_burns\n': 3, 'chief_wiggum\n': 4, 'comic_book_guy\n': 5, 'edna_krabappel\n': 6,
