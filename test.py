@@ -6,14 +6,14 @@ from numpy import linalg as LA
 
 # ASSET_DIR = '../asset'
 #ASSET_DIR = './the-simpsons-characters-dataset'
-ASSET_DIR = '/Users/tianzhang/Documents/NU/EECS349/project/asset'
+ASSET_DIR = './asset'
 ANNOTATION_FILE = ASSET_DIR + '/annotation.txt'
 
 NORM_FACTOR = 128
 OFFSET = 0.5
 
 annotation = open(ANNOTATION_FILE, "r")
-NUMBER = 2000
+NUMBER = 100
 PIC_SIZE = 64
 map_characters = {'abraham_grampa_simpson\n': 0, 'apu_nahasapeemapetilon\n': 1, 'bart_simpson\n': 2,
                   'charles_montgomery_burns\n': 3, 'chief_wiggum\n': 4, 'comic_book_guy\n': 5, 'edna_krabappel\n': 6,
@@ -80,6 +80,7 @@ def norm(v):
     return norm
 
 if __name__ == "__main__":
+    examples = []
     pic_list, x1, y1, x2, y2, tag_ = pic_dir_list()
     # randomly choose 500 pictures from pic_list
     pic_choosen, x1, y1, x2, y2, tag_ = random_choose_pics(pic_list, x1, y1, x2, y2, tag_)
@@ -99,8 +100,10 @@ if __name__ == "__main__":
         image = _parse_function(pic_choosen[i])
         if int(y2[i]) - int(y1[i]) <= 0 or int(x2[i]) - int(x1[i]) <= 0:
             continue
+
         image = tf.image.crop_to_bounding_box(image, int(y1[i]), int(x1[i]), int(y2[i]) - int(y1[i]),
                                               int(x2[i]) - int(x1[i]))
+
         image_resized = tf.image.resize_images(image, [PIC_SIZE, PIC_SIZE], method=1)
 
         # #do the normalizatin for each image:
@@ -122,10 +125,12 @@ if __name__ == "__main__":
                 feature={'label': tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),
                          'image': tf.train.Feature(bytes_list=tf.train.BytesList(value=[feature]))
                          }))
-        if i % 10 == 0 or i % 10 == 5 or i % 10 == 8:
-            test_writer.write(example.SerializeToString())
-        else:
-            train_writer.write(example.SerializeToString())
+        examples.append(example)
+
+    for i in range(0, len(examples) / 3):
+        test_writer.write(examples[i].SerializeToString())
+    for i in range(len(examples) / 3, len(examples)):
+        train_writer.write(examples[i].SerializeToString())
 
     train_writer.close()
     test_writer.close()
