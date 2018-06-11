@@ -60,7 +60,7 @@ def cnn_model_fn():
 
     conv1_norm = tf.layers.batch_normalization(conv1_2, training = tag)
     # Pooling Layer #1
-    pool1 = tf.layers.max_pooling2d(inputs=conv1_norm, pool_size=[5, 5], strides=2)
+    pool1 = tf.layers.max_pooling2d(inputs=conv1_norm, pool_size=[2, 2], strides=2)
 
     # Convolutional Layer #2
     #64
@@ -101,7 +101,7 @@ def cnn_model_fn():
         filters=256,
         kernel_size=[3, 3],
         padding="valid",
-        name="third",
+        name="third_2",
         activation=tf.nn.relu
     )
 
@@ -110,7 +110,7 @@ def cnn_model_fn():
     # Pooling Layer #3
     pool3 = tf.layers.average_pooling2d(inputs=conv3_norm, pool_size=[2, 2], strides=2)
 
-    pool_flat = tf.reshape(pool3, [-1, 7 * 7 * 256])
+    pool_flat = tf.reshape(pool3, [-1, 6 * 6 * 256])
 
     dense = tf.layers.dense(inputs=pool_flat, units=1024, activation=tf.nn.relu)
 
@@ -154,10 +154,10 @@ def save(sess):
 def TrainAndTest():
     # Load training and eval data
     # mnist = tf.contrib.learn.datasets.load_dataset("mnist")
-    batch_size = 512
+    batch_size = 256
     test_step = 10
     x_train, y_train = load_data_source("train.tfrecord", batch_size)
-    x_test, y_test = load_data_source("test.tfrecord", batch_size)
+    x_test, y_test = load_data_source("test.tfrecord", batch_size / 3)
     training_iters = 4000
     x, y, tag, train_op, accuracy, loss, merged = cnn_model_fn()
     init = tf.global_variables_initializer()

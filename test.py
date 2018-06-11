@@ -129,9 +129,9 @@ if __name__ == "__main__":
 
     random.shuffle(examples)
 
-    for i in range(0, len(examples) / 3):
+    for i in range(0, len(examples) * 3 / 10):
         test_writer.write(examples[i].SerializeToString())
-    for i in range(len(examples) / 3, len(examples)):
+    for i in range(len(examples) * 3 / 10, len(examples)):
         train_writer.write(examples[i].SerializeToString())
 
     train_writer.close()
