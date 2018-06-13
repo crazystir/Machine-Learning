@@ -90,21 +90,6 @@ def cnn_model_fn():
 
     pool3_norm = tf.layers.batch_normalization(pool3, training=tag)
 
-    # conv4_1 = tf.layers.conv2d(
-    #     inputs=pool3_norm,
-    #     filters=256,
-    #     kernel_size=[3, 3],
-    #     padding="same",
-    #     name="forth",
-    #     activation=tf.nn.relu
-    # )
-
-    # conv4_1_norm = tf.layers.batch_normalization(conv4_1, training=tag)
-
-    # pool4 = tf.layers.average_pooling2d(inputs=conv4_1, pool_size=[2, 2], strides=2)
-    #
-    # pool4_norm = tf.layers.batch_normalization(pool4, training=tag)
-
     pool_flat = tf.reshape(pool3_norm, [-1, 8 * 8 * 128])
 
     dense = tf.layers.dense(inputs=pool_flat, units=1024, activation=tf.nn.relu)
@@ -153,7 +138,7 @@ def TrainAndTest():
     test_step = 10
     x_train, y_train = load_data_source("train.tfrecord", batch_size)
     x_test, y_test = load_data_source("test.tfrecord", batch_size)
-    img_x_test, img_y_test = load_data_source("image.tfrecord", batch_size)
+    img_x_test, img_y_test = load_data_source("img.tfrecord", batch_size)
 
     training_iters = 300
     x, y, tag, train_op, accuracy, loss, merged, predictions = cnn_model_fn()
@@ -210,4 +195,3 @@ def TrainAndTest():
 
 if __name__=="__main__":
     TrainAndTest()
-
